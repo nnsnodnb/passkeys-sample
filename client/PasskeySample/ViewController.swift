@@ -14,6 +14,7 @@ final class ViewController: UIViewController {
 
     private var userID: String?
 
+    @IBOutlet private var textField: UITextField!
     @IBOutlet private var signUpButton: UIButton! {
         didSet {
             signUpButton.layer.borderColor = UIColor.tintColor.cgColor
@@ -35,14 +36,19 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
     }
 
-    @IBAction func onTapSignUpButton(_ sender: Any) {
+    @IBAction private func onTapSignUpButton(_ sender: Any) {
+        guard let text = textField.text, !text.isEmpty else { return }
+        textField.resignFirstResponder()
         Task {
-            try await startSignUp(email: "nnsnodnb@gmail.com")
+            try await startSignUp(email: text)
         }
     }
-    @IBAction func onTapSignInButton(_ sender: Any) {
+
+    @IBAction private func onTapSignInButton(_ sender: Any) {
+        guard let text = textField.text, !text.isEmpty else { return }
+        textField.resignFirstResponder()
         Task {
-            try await startSignIn(email: "nnsnodnb@gmail.com")
+            try await startSignIn(email: text)
         }
     }
 }
