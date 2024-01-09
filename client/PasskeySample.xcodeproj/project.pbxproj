@@ -14,6 +14,7 @@
 		CF5BB3D42B4A54410059B9F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CF5BB3D32B4A54410059B9F8 /* Assets.xcassets */; };
 		CF5BB3D72B4A54410059B9F8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CF5BB3D52B4A54410059B9F8 /* LaunchScreen.storyboard */; };
 		CF5BB3E02B4A578F0059B9F8 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5BB3DF2B4A578F0059B9F8 /* Response.swift */; };
+		CF8361172B4D408C006D9146 /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8361162B4D408C006D9146 /* AccountService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		CF5BB3D82B4A54410059B9F8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CF5BB3DE2B4A54660059B9F8 /* PasskeySample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PasskeySample.entitlements; sourceTree = "<group>"; };
 		CF5BB3DF2B4A578F0059B9F8 /* Response.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
+		CF8361162B4D408C006D9146 /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +70,7 @@
 				CF5BB3D52B4A54410059B9F8 /* LaunchScreen.storyboard */,
 				CF5BB3D82B4A54410059B9F8 /* Info.plist */,
 				CF5BB3DF2B4A578F0059B9F8 /* Response.swift */,
+				CF8361162B4D408C006D9146 /* AccountService.swift */,
 			);
 			path = PasskeySample;
 			sourceTree = "<group>";
@@ -146,6 +149,7 @@
 				CF5BB3E02B4A578F0059B9F8 /* Response.swift in Sources */,
 				CF5BB3CF2B4A54400059B9F8 /* ViewController.swift in Sources */,
 				CF5BB3CB2B4A54400059B9F8 /* AppDelegate.swift in Sources */,
+				CF8361172B4D408C006D9146 /* AccountService.swift in Sources */,
 				CF5BB3CD2B4A54400059B9F8 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
