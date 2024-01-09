@@ -1,0 +1,97 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="71" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="79">
+            <item index="0" class="java.lang.String" itemvalue="pathspec" />
+            <item index="1" class="java.lang.String" itemvalue="cffi" />
+            <item index="2" class="java.lang.String" itemvalue="psycopg2-binary" />
+            <item index="3" class="java.lang.String" itemvalue="mypy-extensions" />
+            <item index="4" class="java.lang.String" itemvalue="pycparser" />
+            <item index="5" class="java.lang.String" itemvalue="awscli" />
+            <item index="6" class="java.lang.String" itemvalue="pyasn1" />
+            <item index="7" class="java.lang.String" itemvalue="drf-yasg" />
+            <item index="8" class="java.lang.String" itemvalue="django-extensions" />
+            <item index="9" class="java.lang.String" itemvalue="flake8" />
+            <item index="10" class="java.lang.String" itemvalue="coreschema" />
+            <item index="11" class="java.lang.String" itemvalue="djangorestframework-simplejwt" />
+            <item index="12" class="java.lang.String" itemvalue="mccabe" />
+            <item index="13" class="java.lang.String" itemvalue="gevent" />
+            <item index="14" class="java.lang.String" itemvalue="djangorestframework" />
+            <item index="15" class="java.lang.String" itemvalue="zope.event" />
+            <item index="16" class="java.lang.String" itemvalue="bpython" />
+            <item index="17" class="java.lang.String" itemvalue="drf-rw-serializers" />
+            <item index="18" class="java.lang.String" itemvalue="black" />
+            <item index="19" class="java.lang.String" itemvalue="gunicorn" />
+            <item index="20" class="java.lang.String" itemvalue="pyxdg" />
+            <item index="21" class="java.lang.String" itemvalue="boto3" />
+            <item index="22" class="java.lang.String" itemvalue="regex" />
+            <item index="23" class="java.lang.String" itemvalue="coreapi" />
+            <item index="24" class="java.lang.String" itemvalue="django" />
+            <item index="25" class="java.lang.String" itemvalue="itypes" />
+            <item index="26" class="java.lang.String" itemvalue="argon2-cffi" />
+            <item index="27" class="java.lang.String" itemvalue="isort" />
+            <item index="28" class="java.lang.String" itemvalue="pytz" />
+            <item index="29" class="java.lang.String" itemvalue="mypy" />
+            <item index="30" class="java.lang.String" itemvalue="pytest-django" />
+            <item index="31" class="java.lang.String" itemvalue="python-dateutil" />
+            <item index="32" class="java.lang.String" itemvalue="django-slack" />
+            <item index="33" class="java.lang.String" itemvalue="redis" />
+            <item index="34" class="java.lang.String" itemvalue="aws-xray-sdk" />
+            <item index="35" class="java.lang.String" itemvalue="webtest" />
+            <item index="36" class="java.lang.String" itemvalue="requests-mock" />
+            <item index="37" class="java.lang.String" itemvalue="cryptography" />
+            <item index="38" class="java.lang.String" itemvalue="django-silk" />
+            <item index="39" class="java.lang.String" itemvalue="types-setuptools" />
+            <item index="40" class="java.lang.String" itemvalue="django-filter" />
+            <item index="41" class="java.lang.String" itemvalue="jpholiday" />
+            <item index="42" class="java.lang.String" itemvalue="line-bot-sdk" />
+            <item index="43" class="java.lang.String" itemvalue="pytest-randomly" />
+            <item index="44" class="java.lang.String" itemvalue="msgpack" />
+            <item index="45" class="java.lang.String" itemvalue="firebase-admin" />
+            <item index="46" class="java.lang.String" itemvalue="types-pytz" />
+            <item index="47" class="java.lang.String" itemvalue="types-toml" />
+            <item index="48" class="java.lang.String" itemvalue="wcwidth" />
+            <item index="49" class="java.lang.String" itemvalue="numpy" />
+            <item index="50" class="java.lang.String" itemvalue="requests" />
+            <item index="51" class="java.lang.String" itemvalue="types-python-dateutil" />
+            <item index="52" class="java.lang.String" itemvalue="celery" />
+            <item index="53" class="java.lang.String" itemvalue="django-ses" />
+            <item index="54" class="java.lang.String" itemvalue="selenium" />
+            <item index="55" class="java.lang.String" itemvalue="pytest-cov" />
+            <item index="56" class="java.lang.String" itemvalue="pytest-mock" />
+            <item index="57" class="java.lang.String" itemvalue="google-auth-httplib2" />
+            <item index="58" class="java.lang.String" itemvalue="grpcio-status" />
+            <item index="59" class="java.lang.String" itemvalue="django-cors-headers" />
+            <item index="60" class="java.lang.String" itemvalue="billiard" />
+            <item index="61" class="java.lang.String" itemvalue="types-six" />
+            <item index="62" class="java.lang.String" itemvalue="coverage-badge" />
+            <item index="63" class="java.lang.String" itemvalue="django-celery-results" />
+            <item index="64" class="java.lang.String" itemvalue="phonenumbers" />
+            <item index="65" class="java.lang.String" itemvalue="pytest" />
+            <item index="66" class="java.lang.String" itemvalue="types-pyopenssl" />
+            <item index="67" class="java.lang.String" itemvalue="tzdata" />
+            <item index="68" class="java.lang.String" itemvalue="django-debug-toolbar" />
+            <item index="69" class="java.lang.String" itemvalue="types-redis" />
+            <item index="70" class="java.lang.String" itemvalue="types-requests" />
+            <item index="71" class="java.lang.String" itemvalue="michael" />
+            <item index="72" class="java.lang.String" itemvalue="pandas" />
+            <item index="73" class="java.lang.String" itemvalue="django-guardian" />
+            <item index="74" class="java.lang.String" itemvalue="django-redis" />
+            <item index="75" class="java.lang.String" itemvalue="grpcio" />
+            <item index="76" class="java.lang.String" itemvalue="pycryptodome" />
+            <item index="77" class="java.lang.String" itemvalue="click-plugins" />
+            <item index="78" class="java.lang.String" itemvalue="types-urllib3" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
