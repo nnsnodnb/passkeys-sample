@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 django = "*"
 fido2 = "*"
+webauthn = "*"
 
 [dev-packages]
 black = "*"

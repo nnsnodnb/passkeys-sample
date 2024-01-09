@@ -1,5 +1,6 @@
 import base64
 import pickle
+import secrets
 
 import fido2.features
 from django.conf import settings
@@ -12,15 +13,11 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_safe
-from fido2.server import Fido2Server
-from fido2.utils import websafe_decode, websafe_encode
 from fido2.webauthn import (
-    AttestationObject,
-    CollectedClientData,
     PublicKeyCredentialRpEntity,
-    PublicKeyCredentialUserEntity,
-    UserVerificationRequirement,
 )
+from webauthn import base64url_to_bytes, verify_registration_response, verify_authentication_response
+from webauthn.helpers import bytes_to_base64url
 
 from .decorators import request_body_json
 from .models import Challenge, Passkey
@@ -60,36 +57,26 @@ def registration_begin(request):
             models.Prefetch("passkey_set", Passkey.objects.filter(), to_attr="passkeys"),
         ]
         user, created = User.objects.prefetch_related(*lookups).get_or_create(email=email, defaults={"username": email})
-        passkeys = [] if created else [passkey.credential_data for passkey in user.passkeys]
+        passkeys = [] if created else [passkey.authenticate_data for passkey in user.passkeys]
 
-        server = Fido2Server(rp)
+        encoded_challenge = base64.b64encode(secrets.token_bytes(32)).decode("ascii")
 
-        options, state = server.register_begin(
-            user=PublicKeyCredentialUserEntity(
-                id=user.id.to_bytes(16, "big"),
-                name=user.email,
-                display_name=user.email,
-            ),
-            credentials=passkeys,
-            user_verification=UserVerificationRequirement.PREFERRED,
-        )
+        state = {
+            "challenge": encoded_challenge,
+        }
 
-        Challenge.objects.create(
-            challenge=options.public_key["challenge"],
+        challenge = Challenge.objects.create(
+            challenge=encoded_challenge,
             user=user,
         )
 
     request.session["fido2_state"] = state
-
-    response = dict(options)
-
-    challenge = base64.b64encode(websafe_decode(response["publicKey"]["challenge"])).decode("ascii")
     excluded_credentials = [base64.b64encode(passkey.credential_id).decode("ascii") for passkey in passkeys]
 
     return JsonResponse(
         {
-            "user_id": response["publicKey"]["user"]["id"],
-            "challenge": challenge,
+            "user_id": base64.b64encode(user.id.to_bytes(16, "big")).decode("ascii"),
+            "challenge": challenge.challenge,
             "excluded_credentials": excluded_credentials,
         }
     )
@@ -101,9 +88,13 @@ def registration_begin(request):
 def registration_complete(request):
     if (state := request.session.pop("fido2_state")) is None:
         return JsonResponse({"error": f"should POST {reverse('registration-begin')}"}, status=400)
-    if (user_id := request.json.get("user_id")) is None:
+    if (base64_user_id := request.json.get("user_id")) is None:
         return JsonResponse({"error": "user_id is required"}, status=400)
-    user_id = int.from_bytes(websafe_decode(user_id), "big")
+    user_id = base64.b64decode(base64_user_id)
+    user_id = int.from_bytes(user_id, "big")
+    if (base64_credential_id := request.json.get("credential_id")) is None:
+        return JsonResponse({"error": "credential_id is required"}, status=400)
+    credential_id = base64.b64decode(base64_credential_id)
     if (base64_attestation_object := request.json.get("attestation_object")) is None:
         return JsonResponse({"error": "attestation_object is required"}, status=400)
     attestation_object = base64.b64decode(base64_attestation_object)
@@ -117,21 +108,34 @@ def registration_complete(request):
         user_id=user_id,
     )
 
-    server = Fido2Server(rp)
+    credential = {
+        "id": bytes_to_base64url(credential_id),
+        "rawId": bytes_to_base64url(credential_id),
+        "response": {
+            "attestationObject": bytes_to_base64url(attestation_object),
+            "clientDataJSON": bytes_to_base64url(client_data_json),
+        },
+        "type": "public-key",
+        "clientExtensionResults": {},
+        "authenticatorAttachment": "platform",
+    }
 
-    auth_data = server.register_complete(
-        state=state,
-        client_data=CollectedClientData(client_data_json),
-        attestation_object=AttestationObject(attestation_object),
+    registration_verification = verify_registration_response(
+        credential=credential,
+        expected_challenge=base64url_to_bytes(challenge.challenge),
+        expected_origin=f"https://{settings.FIDO2_RP_ID}",
+        expected_rp_id=settings.FIDO2_RP_ID,
+        require_user_verification=True,
     )
 
     with transaction.atomic():
         Passkey.objects.create(
-            credential_id=websafe_encode(auth_data.credential_data.credential_id),
-            auth_data=pickle.dumps(auth_data),
+            credential_id=bytes_to_base64url(registration_verification.credential_id),
+            auth_data=pickle.dumps(registration_verification),
             user=challenge.user,
         )
         challenge.delete()
+        request.session["fido2_state"] = None
 
     return JsonResponse(
         {
@@ -154,25 +158,20 @@ def authenticate_begin(request):
     if len(user.passkeys) == 0:
         return JsonResponse({"error": "no passkey"}, status=400)
 
-    server = Fido2Server(rp)
+    encoded_challenge = base64.b64encode(secrets.token_bytes(32)).decode("ascii")
 
-    options, state = server.authenticate_begin(
-        credentials=[passkey.credential_data for passkey in user.passkeys],
-        user_verification=UserVerificationRequirement.PREFERRED,
-    )
+    state = {
+        "challenge": encoded_challenge,
+    }
 
     request.session["fido2_state"] = state
-
-    response = dict(options)
-
-    challenge = base64.b64encode(websafe_decode(response["publicKey"]["challenge"])).decode("ascii")
     allow_credentials = [
-        base64.b64encode(credential.id).decode("ascii") for credential in options.public_key.allow_credentials
+        base64.b64encode(passkey.authenticate_data.credential_id).decode("ascii") for passkey in user.passkeys
     ]
 
     return JsonResponse(
         {
-            "challenge": challenge,
+            "challenge": encoded_challenge,
             "allow_credentials": allow_credentials,
         }
     )
@@ -186,10 +185,14 @@ def authenticate_complete(request):
         return JsonResponse({"error": f"should POST {reverse('authenticate-begin')}"}, status=400)
     if (user_id := request.json.get("user_id")) is None:
         return JsonResponse({"error": "user_id is required"}, status=400)
-    user_id = int.from_bytes(websafe_decode(base64.b64decode(user_id)), "big")
+    user_id = base64.b64decode(base64.b64decode(user_id))
+    user_id = int.from_bytes(user_id, "big")
     if (base64_credential_id := request.json.get("credential_id")) is None:
         return JsonResponse({"error": "credential_id is required"}, status=400)
     credential_id = base64.b64decode(base64_credential_id)
+    if (base64_authenticator_data := request.json.get("authenticator_data")) is None:
+        return JsonResponse({"error": "authenticator_data is required"}, status=400)
+    authenticator_data = base64.b64decode(base64_authenticator_data)
     if (base64_signature := request.json.get("signature")) is None:
         return JsonResponse({"error": "signature is required"}, status=400)
     signature = base64.b64decode(base64_signature)
@@ -199,23 +202,37 @@ def authenticate_complete(request):
 
     passkey = get_object_or_404(
         Passkey.objects.select_related("user"),
-        credential_id=websafe_encode(credential_id),
+        credential_id=bytes_to_base64url(credential_id),
         user_id=user_id,
     )
 
-    server = Fido2Server(rp)
+    credential = {
+        "id": bytes_to_base64url(credential_id),
+        "rawId": bytes_to_base64url(credential_id),
+        "response": {
+            "authenticatorData": bytes_to_base64url(authenticator_data),
+            "clientDataJSON": bytes_to_base64url(client_data_json),
+            "signature": bytes_to_base64url(signature),
+        },
+        "type": "public-key",
+        "authenticatorAttachment": "platform",
+        "clientExtensionResults": {},
+    }
 
-    server.authenticate_complete(
-        state=state,
-        credentials=[passkey.credential_data],
-        credential_id=credential_id,
-        client_data=CollectedClientData(client_data_json),
-        auth_data=passkey.authenticate_data,
-        signature=signature,
+    authentication_verification = verify_authentication_response(
+        credential=credential,
+        expected_challenge=base64url_to_bytes(state["challenge"]),
+        expected_rp_id=settings.FIDO2_RP_ID,
+        expected_origin=f"https://{settings.FIDO2_RP_ID}",
+        credential_public_key=passkey.authenticate_data.credential_public_key,
+        credential_current_sign_count=passkey.sign_count,
+        require_user_verification=True,
     )
 
-    passkey.sign_count += 1
-    passkey.save(update_fields=["sign_count"])
+    with transaction.atomic():
+        passkey.sign_count = authentication_verification.new_sign_count
+        passkey.save(update_fields=["sign_count"])
+        request.session["fido2_state"] = None
 
     return JsonResponse(
         {
