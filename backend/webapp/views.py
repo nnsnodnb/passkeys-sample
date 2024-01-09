@@ -12,12 +12,11 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_safe
-from webauthn import base64url_to_bytes, verify_registration_response, verify_authentication_response
+from webauthn import base64url_to_bytes, verify_authentication_response, verify_registration_response
 from webauthn.helpers import bytes_to_base64url
 
 from .decorators import request_body_json
 from .models import Challenge, Passkey
-
 
 User = get_user_model()
 
