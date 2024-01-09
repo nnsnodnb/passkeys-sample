@@ -2,7 +2,6 @@ import base64
 import pickle
 import secrets
 
-import fido2.features
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -13,19 +12,14 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_safe
-from fido2.webauthn import (
-    PublicKeyCredentialRpEntity,
-)
 from webauthn import base64url_to_bytes, verify_registration_response, verify_authentication_response
 from webauthn.helpers import bytes_to_base64url
 
 from .decorators import request_body_json
 from .models import Challenge, Passkey
 
-fido2.features.webauthn_json_mapping.enabled = True
 
 User = get_user_model()
-rp = PublicKeyCredentialRpEntity(id=settings.FIDO2_RP_ID, name=settings.FIDO2_SERVER_NAME)
 
 
 @require_safe
