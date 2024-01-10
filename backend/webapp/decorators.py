@@ -11,7 +11,7 @@ def request_body_json(func):
                 data = json.loads(request.body)
                 setattr(request, "json", data)
                 return view_func(request, *args, **kwargs)
-            except Exception as e:
+            except json.decoder.JSONDecodeError as e:
                 return JsonResponse({"error": str(e)}, status=400)
 
         return wrapper
