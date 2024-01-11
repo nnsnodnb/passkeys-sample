@@ -157,7 +157,13 @@ def authenticate_begin(request):
         "challenge": encoded_challenge,
     }
 
-    request.session["fido2_state"] = state
+    with transaction.atomic():
+        Challenge.objects.create(
+            challenge=encoded_challenge,
+            user=user,
+        )
+        request.session["fido2_state"] = state
+
     allow_credentials = [
         base64.b64encode(passkey.authenticate_data.credential_id).decode("ascii") for passkey in user.passkeys
     ]
@@ -193,6 +199,11 @@ def authenticate_complete(request):
         return JsonResponse({"error": "client_data_json is required"}, status=400)
     client_data_json = base64.b64decode(base64_client_data_json)
 
+    challenge = get_object_or_404(
+        Challenge,
+        challenge=state["challenge"],
+        user_id=user_id,
+    )
     passkey = get_object_or_404(
         Passkey.objects.select_related("user"),
         credential_id=bytes_to_base64url(credential_id),
@@ -225,6 +236,7 @@ def authenticate_complete(request):
     with transaction.atomic():
         passkey.sign_count = authentication_verification.new_sign_count
         passkey.save(update_fields=["sign_count"])
+        challenge.delete()
         request.session["fido2_state"] = None
 
     return JsonResponse(
