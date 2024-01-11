@@ -184,7 +184,7 @@ def authenticate_complete(request):
         return JsonResponse({"error": f"should POST {reverse('authenticate-begin')}"}, status=400)
     if (user_id := request.json.get("user_id")) is None:
         return JsonResponse({"error": "user_id is required"}, status=400)
-    user_id = base64.b64decode(base64.b64decode(user_id))
+    user_id = base64.b64decode(user_id)
     user_id = int.from_bytes(user_id, "big")
     if (base64_credential_id := request.json.get("credential_id")) is None:
         return JsonResponse({"error": "credential_id is required"}, status=400)

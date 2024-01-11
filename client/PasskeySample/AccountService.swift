@@ -30,7 +30,7 @@ final class AccountService: NSObject {
         let registrationRequest = provider.createCredentialRegistrationRequest(
             challenge: response.challenge,
             name: email,
-            userID: Data(response.userID.utf8)
+            userID: Data(base64Encoded: response.userID) ?? .init()
         )
         registrationRequest.displayName = email
         registrationRequest.userVerificationPreference = .preferred
