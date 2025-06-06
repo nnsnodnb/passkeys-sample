@@ -196,12 +196,12 @@
         },
         "django": {
             "hashes": [
-                "sha256:09e8128f717266bf382d82ffa4933f13da05d82579abf008ede86acb15dec88b",
-                "sha256:e7d98fa05ce09cb3e8d5ad6472fb602322acd1740bfdadc29c8404182d664f65"
+                "sha256:19c9b771e9cf4de91101861aadd2daaa159bcf10698ca909c5755c88e70ccb84",
+                "sha256:73e5d191421d177803dbd5495d94bc7d06d156df9561f4eea9e11b4994c07137"
             ],
             "index": "pypi",
             "markers": "python_version >= '3.10'",
-            "version": "==5.0.11"
+            "version": "==5.1.10"
         },
         "pycparser": {
             "hashes": [
